@@ -18,9 +18,8 @@ colnames(dge_merged@meta.data)
 dge_merged <- JoinLayers(dge_merged)
 
 
-##=================================================================
 ##Ambient RNA decontamination
-##=================================================================
+
 
 sce <- SingleCellExperiment(list(counts = LayerData(dge_merged, assay = "RNA", layer = "counts" )))
 sce <- decontX(sce)
@@ -33,9 +32,9 @@ dim(dge)
 colnames(dge@meta.data)
 saveRDS( dge, "dge_postDecontX10thSept.rds")
 
-##=============================================================
+
 ##Assign patient IDs (explicit lookup)
-##=============================================================
+
 sample_to_patient <- c(
   "GSM8878307_HY_20847_N2_S16" = "20847_N",
   "GSM8878308_HY_20847_T1-1_S19" = "20847_T",
@@ -112,9 +111,9 @@ ncol(sce_count) == ncol(dge_merged)
 dge_merged$patient <- unname(sample_to_patient[dge_merged$sample])
 table(dge_merged$patient, useNA = "always")
 
-##=========================================================
+
 ##Assign patient-level Name groups(paper-wise mapping)
-##========================================================
+
 
 dge_merged$Name <- "Unknown"
 dge_merged$Name[dge_merged$patient %in% c("21217_N", "21217_T")] <- "VAR11"
@@ -136,15 +135,15 @@ dge_merged$Name[dge_merged$patient %in% c("SG")] <- "UC2"
 table(dge_merged$Name, useNA = "always")
 ncol(dge_merged)
 
-##===================================================
+
 ##Normalization -LogNormalize, scale factor 10000 (paper's value)
-##===================================================
+
 
 dge <- NormalizeData(object = dge, normalization.method = "LogNormalize" , scale.factor = 10000 )
 
-##==================================================
+
 ##Variable features- top 2000(paper's value)
-##==================================================
+
 
 dge <- FindVariableFeatures( object = dge, selection.method = "vst", nfeatures = 2000)
 top10 <- head(x= VariableFeatures(object = dge), 10)
@@ -155,9 +154,9 @@ plot2 <- LabelPoints( plot = plot1 , points = top10 ,repel =TRUE, xnudge = 0, yn
 combined_plot <- plot1 + plot2
 ggsave(file = "VariableFeature_2000_10thSept.pdf", plot = combined_plot, width = 20 , height = 20 , units = "cm")
 
-##==================================================
+
 ## Scale + PCA - 100 PCs stored(paper's value)
-##==================================================
+
 dge <- ScaleData(object = dge, features = VariableFeatures(object = dge))
 dge <- RunPCA(object = dge, features = VariableFeatures(object = dge), npcs = 100)
 
@@ -171,9 +170,9 @@ eigValues <- (pca@stdev)^2
 varExplained <- eigValues / total_variance
 sum(varExplained)
 
-##=================================================
+
 ## Attach patient/Name metadata onto post-decontX dge
-##=================================================
+
 
 identical(colnames(dge),colnames(dge_merged))
 dge$patient <- dge_merged$patient
@@ -191,9 +190,9 @@ png("Elbowplot_dge10thSept.png")
 ElbowPlot(dge, ndims = 100)
 dev.off()
 
-##===============================================
+
 ##Clustering - 75 PCs used for graph/clustering/UMAP(paper's value)
-##===============================================
+
 n_pc <- 75
 dge <- FindNeighbors(dge, dims = 1:n_pc, k.param = 30)
 dge <- FindClusters(dge, resolution=c(0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0))
@@ -206,17 +205,17 @@ dev.off()
 dge <- FindClusters(dge, resolution = 0.5)
 length(unique(Idents(dge)))
 
-##===============================================
+
 ## t-SNE(using same 75 PCs)
-##===============================================
+
 
 dge <- RunTSNE(dge, dims = 1:n_pc, perplexity = 40, seed.use = 10, check_duplicates = FALSE)
 p <- DimPlot(dge, reduction = "tsne", label = TRUE, pt.size = 1) + NoLegend()
 ggsave( file = "TSNE_raw10thSept.pdf" , plot = p , width = 20 , height = 20, units = "cm")
 
-##==============================================
+
 ## UMAP(using same 75 PCs)
-##==============================================
+
 
 dge <- RunUMAP (dge, dims = 1:n_pc)
 
@@ -225,9 +224,9 @@ ggsave(file= "Umap_raw10thSept.pdf", plot = p, width = 20 , height = 20 , units 
 p <- DimPlot (dge, reduction = "umap", group.by = "Name", label = FALSE)
 ggsave(file = "Umap_byPatient10thSept.pdf", plot = p , width = 25 , height = 20 , units = "cm")
 
-##=============================================
+
 ## Marker genes for cell-type annotation
-##=============================================
+
 
 marker_genes <- list(
   Epithelial    = c("EPCAM", "KRT8", "KRT18", "KRT19", "CDH1"),
@@ -254,9 +253,9 @@ avg_exp <- AverageExpression(dge, features = present_markers, group.by = "seurat
 avg_exp_mat <- avg_exp$RNA
 View(avg_exp_mat)
 
-##===================================================
+
 ## Assign cell-type labels per cluster(filled on the basis of DotPlot inspection)
-##===================================================
+
 cluster_to_celltype <- c(
   "0"  = "Immune",   "1"  = "Fibroblast",    "2"  = "Epithelial",
   "3"  = "Smooth_Muscle",    "4"  = "Fibroblast",     "5"  = "Immune",
