@@ -279,7 +279,7 @@ celltype_colors <- c(
   "Epithelial"    = "#B79F00",
   "Fibroblast"    = "#00BA38",
   "Immune"        = "#00BFC4",
-  "Smooth_Muscle" = "#F564E3",
+  "Smooth_Muscle" = "#F564E3"
   
 )
 
