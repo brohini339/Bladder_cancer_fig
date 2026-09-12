@@ -3,6 +3,10 @@ library(data.table)
 library(DoubletFinder)
 library(dplyr)
 
+## 1. Load per-sample DGE matrices
+
+
+
 dge_files <- list.files("C:/Users/rohin/Desktop/Pre_doc_projects/Project_RB/Huang_Lab/GSE293189_RAW_extracted",
                         pattern = "_dge.txt$", full.names = TRUE)
 
@@ -21,6 +25,11 @@ for (f in dge_files) {
 length(seurat_list)
 sapply(seurat_list , ncol)
 
+## 2. QC filtering - according to the paper's 
+##                   exact thresholds
+##     <300 genes, <500 transcripts, >=20% mito removed
+
+
 for (id in names(seurat_list)) {
   obj <- seurat_list[[id]]
   obj$percent.mt <- PercentageFeatureSet(obj, pattern = "^MT-")
@@ -31,6 +40,9 @@ for (id in names(seurat_list)) {
 }
 
 sapply(seurat_list, ncol)
+
+## 3. Doublet removal- DoubletFinder, per sample
+
 
 for (id in names(seurat_list)) {
   obj <- seurat_list[[id]]
@@ -58,6 +70,8 @@ for (id in names(seurat_list)) {
 }
 
 sapply(seurat_list, ncol)
+
+## 4. Merge all samples and save
 
 dge_merged <- merge(seurat_list[[1]], y= seurat_list[-1],
                      add.cell.ids = names(seurat_list))
