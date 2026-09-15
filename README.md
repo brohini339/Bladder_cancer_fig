@@ -9,6 +9,12 @@ QC- Contains QC_DGE_070926.R , the script for QC filtering according to the pape
 
 UMAP_wholedata - Contains UMAP_generation_11thSept.R , the script for  ambient RNA decontamination , normalization, and clustering pipeline for the QC'd, doublet-filtered bladder cancer scRNA-seq dataset , reproducing the published methods and annotating clusters into five major cell types via canonical marker expression.
 
+mainpaper_and_supplementarydata -Contains the following files:
+
+s41467-025-59888-8.pdf- the main paper
+
+41467_2025_59888_MOESM1_ESM.pdf - the supplementary data provided with the paper
+
 Results- Contains the following generated results:
 VariableFeature_2000_11thSept.pdf - Scatter plot of the top 2000 variable genes (mean expression vs. dispersion), with the 10 most variable genes labelled.
 PCA_byName11thSept.pdf- Cells in PCA space (PC1 vs PC2), coloured by patient group (Name). 
